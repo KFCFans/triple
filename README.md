@@ -1,2 +1,2 @@
 # triple
-A high performance, distributed, full-duplex RPC framework.（全双工RPC框架）
+A high-performance, full-duplex, java based open source RPC framework（全双工RPC框架）
