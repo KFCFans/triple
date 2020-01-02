@@ -15,6 +15,7 @@
 
     <properties>
         <netty.version>4.1.44.FINAL</netty.version>
+        <slf4j-api.version>1.7.30</slf4j-api.version>
         <spring.framework.version>5.2.2.RELEASE</spring.framework.version>
     </properties>
 
@@ -32,6 +33,14 @@
             <artifactId>spring-context</artifactId>
             <version>${spring.framework.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j-api.version}</version>
+        </dependency>
+
 
     </dependencies>
 </project>
