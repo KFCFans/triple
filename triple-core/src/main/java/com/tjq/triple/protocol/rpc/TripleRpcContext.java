@@ -1,9 +1,8 @@
 package com.tjq.triple.protocol.rpc;
 
+import com.tjq.triple.protocol.TripleTransportObject;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Serializable;
 
 /**
  * RPC 调用上下文
@@ -13,7 +12,7 @@ import java.io.Serializable;
  */
 @Setter
 @Getter
-public class TripleRpcContext implements Serializable {
+public class TripleRpcContext implements TripleTransportObject {
 
     private static final long serialVersionUID = 1L;
 

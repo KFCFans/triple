@@ -1,9 +1,8 @@
 package com.tjq.triple.protocol.rpc;
 
+import com.tjq.triple.protocol.TripleTransportObject;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.io.Serializable;
 
 /**
  * RPC 响应对象
@@ -13,7 +12,7 @@ import java.io.Serializable;
  */
 @Setter
 @Getter
-public class TripleRpcResponse implements Serializable {
+public class TripleRpcResponse implements TripleTransportObject {
 
     private static final long serialVersionUID = 1L;
 
@@ -21,4 +20,12 @@ public class TripleRpcResponse implements Serializable {
     private String requestId;
     private Object result;
     private String message;
+
+    /* ********* code definition ********* */
+
+    // 2XX：调用成功且正常返回
+    public static final short SUCCESS = 200;
+    public static final short INVOKE_SUCCESS_EXECUTE_FAILED = 201;
+    // 4XX：调用失败，比如网络原因导致TCP连接断开等
+    public static final short INVOKE_FAILED = 400;
 }

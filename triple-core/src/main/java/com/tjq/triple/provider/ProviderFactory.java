@@ -2,6 +2,7 @@ package com.tjq.triple.provider;
 
 import com.google.common.collect.Maps;
 import com.tjq.triple.annotation.TripleProvider;
+import com.tjq.triple.common.exception.TripleRpcException;
 import com.tjq.triple.provider.invoker.JDKReflectInvoker;
 import com.tjq.triple.provider.invoker.LocalInvoker;
 import lombok.extern.slf4j.Slf4j;
@@ -20,15 +21,16 @@ import java.util.Map;
 @Slf4j
 public abstract class ProviderFactory {
 
+    private static volatile boolean initialized = false;
     // group_version -> (className -> invoker)
-    private final Map<String, Map<String, LocalInvoker>> providerData;
+    private static final Map<String, Map<String, LocalInvoker>> providerData = Maps.newHashMap();
 
     protected abstract Collection<Object> providerBeans();
 
-    public ProviderFactory() {
-
-        providerData = Maps.newHashMap();
-
+    private void init() {
+        if (initialized) {
+            return;
+        }
         Collection<Object> beans = providerBeans();
 
         if (CollectionUtils.isEmpty(beans)) {
@@ -42,18 +44,24 @@ public abstract class ProviderFactory {
             ifName2PB.put(genServiceInterfaceName(tripleProvider), genProxy(bean));
         });
         log.info("[TripleProvider] triple finds {} provider successfully.", beans.size());
+        initialized = true;
     }
 
-    public Object invoke(String group, String version, String className, String methodName, Class<?>[] parameterTypes, Object[] parameters) throws Exception {
+    public static Object invoke(String group, String version, String className, String methodName, Class<?>[] parameterTypes, Object[] parameters) throws Exception {
+
+        if (!initialized) {
+            throw new TripleRpcException("[TripleProvider] please initialize the ProviderFactory first");
+        }
+
         Map<String, LocalInvoker> className2Invoker = providerData.get(genServiceKey(group, version));
         if (CollectionUtils.isEmpty(className2Invoker)) {
             log.error("[TripleProvider] no provider found by group:{} and version:{}", group, version);
-            throw new RuntimeException("no provider found by current group and version");
+            throw new TripleRpcException("no provider found by current group and version");
         }
         LocalInvoker invoker = className2Invoker.get(className);
         if (invoker == null) {
             log.error("[TripleProvider] no provider found by className:{}", className);
-            throw new RuntimeException("no provider found by className:" + className);
+            throw new TripleRpcException("no provider found by className:" + className);
         }
         return invoker.invoke(methodName, parameterTypes, parameters);
     }
@@ -82,7 +90,7 @@ public abstract class ProviderFactory {
             case 1:return interfaces[0].getName();
         }
         log.error("[TripleProvider] init provider failed, please specify the interfaceName or interfaceClass");
-        throw new RuntimeException("please specify the interfaceName or interfaceClass");
+        throw new TripleRpcException("please specify the interfaceName or interfaceClass");
     }
 
     /**
