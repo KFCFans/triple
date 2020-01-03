@@ -3,7 +3,6 @@ package com.tjq.triple.protocol;
 import com.tjq.triple.common.exception.TripleRpcException;
 import com.tjq.triple.protocol.rpc.TripleRpcRequest;
 import com.tjq.triple.protocol.rpc.TripleRpcResponse;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**

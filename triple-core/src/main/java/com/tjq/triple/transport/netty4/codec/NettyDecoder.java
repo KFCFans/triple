@@ -1,4 +1,4 @@
-package com.tjq.triple.transport.netty4.handler.codec;
+package com.tjq.triple.transport.netty4.codec;
 
 import com.tjq.triple.protocol.TripleProtocol;
 import com.tjq.triple.protocol.TripleRpcCMD;
@@ -13,6 +13,7 @@ import java.util.List;
 
 /**
  * decoder
+ * 循环读高效还是这样返回 return 高效？小型数据差距应该不大，大对象传输需要做实验验证，理论上应该是循环效率高
  *
  * @author tjq
  * @since 2020/1/3
@@ -36,9 +37,10 @@ public class NettyDecoder extends ByteToMessageDecoder {
         byte cmd = in.readByte();
         int length = in.readInt();
 
-        // 如果此时发生粘包，后面的 RPC 请求也会被丢弃
+        // 如果此时发生粘包，后面的 RPC 请求可能也会被丢弃，不过最终可恢复
         if (magic != TripleProtocol.TRIPLE_PROTOCOL_MAGIC) {
             in.skipBytes(in.readableBytes());
+            return;
         }
 
         if (in.readableBytes() < length) {

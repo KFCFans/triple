@@ -1,6 +1,6 @@
 package com.tjq.triple.consumer;
 
-import com.tjq.triple.transport.netty4.ConnectionPool;
+import com.tjq.triple.transport.netty4.NettyConnectionPool;
 import org.springframework.util.StringUtils;
 
 /**
@@ -28,11 +28,11 @@ public class TripleReferenceBean<T> {
     private void initConnection() {
 
         if (StringUtils.isEmpty(address)) {
-            if (ConnectionPool.hasAvailableConnection()) {
+            if (NettyConnectionPool.hasAvailableConnection()) {
                 return;
             }
         }else {
-            if (ConnectionPool.hasAvailableConnection(address)) {
+            if (NettyConnectionPool.hasAvailableConnection(address)) {
                 return;
             }
         }

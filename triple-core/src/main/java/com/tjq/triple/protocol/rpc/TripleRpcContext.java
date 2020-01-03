@@ -1,8 +1,12 @@
 package com.tjq.triple.protocol.rpc;
 
+import com.google.common.collect.Maps;
+import com.tjq.triple.common.UniqueIDGenerator;
 import com.tjq.triple.protocol.TripleTransportObject;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.Map;
 
 /**
  * RPC 调用上下文
@@ -16,7 +20,29 @@ public class TripleRpcContext implements TripleTransportObject {
 
     private static final long serialVersionUID = 1L;
 
-    private String requestId;
-    private long startTime;
+    /**
+     * 本地唯一ID，Triple 负责生成
+     */
+    private Long requestId;
+    /**
+     * 分布式唯一ID，调用方若有链路追踪的需求则自行传入
+     */
+    private String traceId;
+    private Long startTime;
     private String version;
+
+    private Map<String, Object> context;
+
+    public TripleRpcContext() {
+        requestId = UniqueIDGenerator.genId();
+        startTime = System.currentTimeMillis();
+        version = "triple:1.0.0";
+    }
+
+    public void addContext(String key, Object value) {
+        if (context == null) {
+            context = Maps.newHashMap();
+        }
+        context.put(key, value);
+    }
 }

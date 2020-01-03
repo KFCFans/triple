@@ -14,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2020/1/3
  */
 @Slf4j
-public class TripleServerBootstrap {
+public class NettyServerBootstrap {
 
     /**
      * config info
@@ -22,7 +22,7 @@ public class TripleServerBootstrap {
     private String ip;
     private int port;
 
-    public TripleServerBootstrap(String ip, int port) {
+    public NettyServerBootstrap(String ip, int port) {
         this.ip = ip;
         this.port = port;
     }

@@ -17,7 +17,8 @@ public class TripleRpcResponse implements TripleTransportObject {
     private static final long serialVersionUID = 1L;
 
     private short code;
-    private String requestId;
+    private Long requestId;
+    private String traceId;
     private Object result;
     private String message;
 

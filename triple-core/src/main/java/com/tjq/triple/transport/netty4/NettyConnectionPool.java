@@ -14,7 +14,7 @@ import java.util.Map;
  * @since 2020/1/3
  */
 @Slf4j
-public class ConnectionPool {
+public class NettyConnectionPool {
 
     /**
      * IP:port -> Channel
