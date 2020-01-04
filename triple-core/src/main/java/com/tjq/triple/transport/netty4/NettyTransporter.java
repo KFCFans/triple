@@ -1,5 +1,6 @@
 package com.tjq.triple.transport.netty4;
 
+
 import com.tjq.triple.common.exception.TripleRpcException;
 import com.tjq.triple.protocol.TripleProtocol;
 import com.tjq.triple.transport.Transporter;
@@ -7,6 +8,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import lombok.AllArgsConstructor;
 
+import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -19,6 +21,18 @@ import java.util.concurrent.TimeUnit;
 public class NettyTransporter implements Transporter {
 
     private final Channel channel;
+
+    @Override
+    public String remoteAddress() {
+        String ip = ((InetSocketAddress) channel.remoteAddress()).getAddress().getHostAddress();
+        int port = ((InetSocketAddress) channel.remoteAddress()).getPort();
+        return genAddress(ip, port);
+    }
+
+    @Override
+    public boolean available() {
+        return channel.isActive();
+    }
 
     @Override
     public void sendSync(TripleProtocol protocol, long timeoutMS) throws TripleRpcException {

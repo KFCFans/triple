@@ -1,13 +1,17 @@
 package com.tjq.triple.transport.netty4.handler;
 
+import com.tjq.triple.common.exception.ProviderExecuteException;
 import com.tjq.triple.protocol.TripleProtocol;
 import com.tjq.triple.protocol.rpc.TripleRpcRequest;
 import com.tjq.triple.protocol.rpc.TripleRpcResponse;
 import com.tjq.triple.provider.ProviderFactory;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+
+import java.util.concurrent.Executor;
 
 /**
  * RPC 请求处理
@@ -16,12 +20,15 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
  * @since 2020/1/3
  */
 @Slf4j
-public class RpcRequestHandler extends SimpleChannelInboundHandler<TripleRpcRequest> {
+@AllArgsConstructor
+public class NettyRpcRequestHandler extends SimpleChannelInboundHandler<TripleRpcRequest> {
+
+    private final Executor pool;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TripleRpcRequest msg) throws Exception {
-        // TODO：线程池执行
-        ctx.writeAndFlush(TripleProtocol.buildRpcResponse(invoke(msg)));
+        // writeAndFlush 为异步操作，异常处理放在 Transport 层实现
+        pool.execute(() -> ctx.writeAndFlush(TripleProtocol.buildRpcResponse(invoke(msg))));
     }
 
     @Override
@@ -47,10 +54,9 @@ public class RpcRequestHandler extends SimpleChannelInboundHandler<TripleRpcRequ
             Object res = ProviderFactory.invoke(group, version, className, methodName, parameterTypes, parameters);
             response.setCode(TripleRpcResponse.SUCCESS);
             response.setResult(res);
-        }catch (Exception e) {
+        }catch (Throwable t) {
             response.setCode(TripleRpcResponse.INVOKE_SUCCESS_EXECUTE_FAILED);
-            // 暂时先将堆栈 String 化进行传递，后期尝试直接序列化 exception
-            response.setMessage(ExceptionUtils.getStackTrace(e));
+            response.setThrowable(new ProviderExecuteException(t));
         }
         return response;
     }

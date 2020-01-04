@@ -16,10 +16,10 @@ import java.util.concurrent.Future;
 @Getter
 @NoArgsConstructor
 public class FutureStore<T> {
+
     private boolean success;
     private T data;
     private Throwable throwable;
-    
     
     public void fill(Future<T> future) {
         try {

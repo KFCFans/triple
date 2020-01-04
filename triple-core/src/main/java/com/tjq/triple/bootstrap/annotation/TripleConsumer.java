@@ -1,4 +1,4 @@
-package com.tjq.triple.annotation;
+package com.tjq.triple.bootstrap.annotation;
 
 import java.lang.annotation.*;
 

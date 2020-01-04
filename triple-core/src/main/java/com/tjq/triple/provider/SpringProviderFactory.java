@@ -1,6 +1,6 @@
 package com.tjq.triple.provider;
 
-import com.tjq.triple.annotation.TripleProvider;
+import com.tjq.triple.bootstrap.annotation.TripleProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.context.ApplicationContext;
 

@@ -13,7 +13,7 @@ public class UniqueIDGenerator {
     // 0 -> MAX -> MIN -> 0 loop
     private static final AtomicLong ID_FACTORY = new AtomicLong(0);
 
-    public static Long genId() {
+    public static Long allocate() {
         return ID_FACTORY.getAndIncrement();
     }
 }

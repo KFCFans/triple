@@ -1,6 +1,6 @@
 package com.tjq.triple.sample.spring.provider.service;
 
-import com.tjq.triple.annotation.TripleProvider;
+import com.tjq.triple.bootstrap.annotation.TripleProvider;
 import com.tjq.triple.sample.api.HelloService;
 import com.tjq.triple.sample.api.ResultDTO;
 

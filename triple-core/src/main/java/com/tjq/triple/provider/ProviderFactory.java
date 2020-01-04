@@ -1,7 +1,7 @@
 package com.tjq.triple.provider;
 
 import com.google.common.collect.Maps;
-import com.tjq.triple.annotation.TripleProvider;
+import com.tjq.triple.bootstrap.annotation.TripleProvider;
 import com.tjq.triple.common.exception.TripleRpcException;
 import com.tjq.triple.provider.invoker.JDKReflectInvoker;
 import com.tjq.triple.provider.invoker.LocalInvoker;

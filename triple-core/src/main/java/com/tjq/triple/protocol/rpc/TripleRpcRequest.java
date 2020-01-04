@@ -2,8 +2,8 @@ package com.tjq.triple.protocol.rpc;
 
 import com.tjq.triple.protocol.TripleTransportObject;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * RPC 请求对象
@@ -13,6 +13,7 @@ import lombok.Setter;
  */
 @Setter
 @Getter
+@ToString
 public class TripleRpcRequest implements TripleTransportObject {
 
     private static final long serialVersionUID = 1L;
@@ -25,7 +26,6 @@ public class TripleRpcRequest implements TripleTransportObject {
     private Class<?>[] parameterTypes;
     private Object[] parameters;
 
-    @Getter
     private TripleRpcContext context;
 
     public TripleRpcRequest() {

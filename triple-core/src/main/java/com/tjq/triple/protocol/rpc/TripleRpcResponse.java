@@ -4,6 +4,7 @@ import com.tjq.triple.protocol.TripleTransportObject;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 /**
  * RPC 响应对象
@@ -13,6 +14,7 @@ import lombok.Setter;
  */
 @Setter
 @Getter
+@ToString
 @NoArgsConstructor
 public class TripleRpcResponse implements TripleTransportObject {
 
@@ -22,7 +24,7 @@ public class TripleRpcResponse implements TripleTransportObject {
     private Long requestId;
     private String traceId;
     private Object result;
-    private String message;
+    private Throwable throwable;
 
     /* ********* code definition ********* */
 

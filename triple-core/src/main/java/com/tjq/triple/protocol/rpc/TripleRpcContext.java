@@ -5,6 +5,7 @@ import com.tjq.triple.common.UniqueIDGenerator;
 import com.tjq.triple.protocol.TripleTransportObject;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import java.util.Map;
  */
 @Setter
 @Getter
+@ToString
 public class TripleRpcContext implements TripleTransportObject {
 
     private static final long serialVersionUID = 1L;
@@ -34,7 +36,7 @@ public class TripleRpcContext implements TripleTransportObject {
     private Map<String, Object> context;
 
     public TripleRpcContext() {
-        requestId = UniqueIDGenerator.genId();
+        requestId = UniqueIDGenerator.allocate();
         startTime = System.currentTimeMillis();
         version = "triple:1.0.0";
     }

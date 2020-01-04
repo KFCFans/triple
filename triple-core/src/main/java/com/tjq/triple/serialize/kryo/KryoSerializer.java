@@ -3,6 +3,7 @@ package com.tjq.triple.serialize.kryo;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.tjq.triple.common.exception.TripleRpcException;
 import com.tjq.triple.serialize.Serializer;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +28,7 @@ public class KryoSerializer implements Serializer {
                 Output output = new Output(byteArrayOutputStream)
         ) {
             kryo.writeClassAndObject(output, obj);
+            output.flush();
             return byteArrayOutputStream.toByteArray();
         } catch (Exception e) {
             log.error("[Triple] serialize by kryo failed.", e);
@@ -57,6 +59,8 @@ public class KryoSerializer implements Serializer {
         kryo.setRegistrationRequired(false);
         // 支持循环引用，也会导致性能些许下降 T_T
         kryo.setReferences(true);
+        // 增加异常序列化器
+        kryo.addDefaultSerializer(Throwable.class, new JavaSerializer());
         return kryo;
     });
 }

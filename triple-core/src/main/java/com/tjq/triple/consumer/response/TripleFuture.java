@@ -6,7 +6,7 @@ import com.tjq.triple.protocol.rpc.TripleRpcRequest;
 import com.tjq.triple.protocol.rpc.TripleRpcResponse;
 import lombok.Getter;
 
-import java.util.Arrays;
+import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.concurrent.*;
 
@@ -58,34 +58,41 @@ public class TripleFuture implements Future<TripleRpcResponse> {
     }
 
     @Override
-    public TripleRpcResponse get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public TripleRpcResponse get(long timeout, @Nonnull TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         boolean done = latch.await(timeout, unit);
         if (done) {
             return response;
         }
-        String s = String.format("triple rpc invoke timeout(class=%s&method=%s)", request.getClassName(), request.getMethodName());
+        String s = String.format("rpc invoke timeout(class=%s&method=%s)", request.getClassName(), request.getMethodName());
         throw new TripleRpcException(s);
     }
 
     /**
      * 设置返回结果
      */
+    @SuppressWarnings("unchecked")
     public void finishedInvoke(TripleRpcResponse response) {
         this.response = response;
         latch.countDown();
         // 执行回调
         if (callBacks != null) {
-            callBacks.forEach(c -> c.onComplete(response));
+            callBacks.forEach(callBack -> {
+                if (TripleRpcResponse.SUCCESS == response.getCode()) {
+                    callBack.onComplete(true, response.getResult(), null);
+                }else {
+                    callBack.onComplete(false, null, response.getThrowable());
+                }
+            });
         }
     }
 
     /**
      * 添加回调监听
      */
-    public void addListeners(TripleCallBack... cbs) {
+    public void addListeners(@Nonnull TripleCallBack... cbs) {
         if (callBacks == null) {
             callBacks = Lists.newLinkedList();
         }
-        callBacks.addAll(Arrays.asList(cbs));
+        callBacks.addAll(Lists.newArrayList(cbs));
     }
 }

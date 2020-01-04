@@ -24,10 +24,16 @@ public class FuturePool {
      */
     private static final Map<Long, TripleFuture> STORE = Maps.newConcurrentMap();
 
+    /**
+     * 异步调用时获取当前调用的 TripleFuture
+     */
+    private static final ThreadLocal<TripleFuture> CURRENT_FUTURE = new ThreadLocal<>();
+
     public static TripleFuture push(TripleRpcRequest request) {
         Long requestId = request.getContext().getRequestId();
         TripleFuture future = new TripleFuture(request);
         STORE.put(requestId, future);
+        CURRENT_FUTURE.set(future);
         return future;
     }
 
@@ -37,5 +43,12 @@ public class FuturePool {
 
     public static TripleFuture get(Long id) {
         return STORE.get(id);
+    }
+
+    /**
+     * 异步调用模式获取 TripleFuture
+     */
+    public static TripleFuture currentFuture() {
+        return CURRENT_FUTURE.get();
     }
 }
