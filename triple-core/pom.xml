@@ -17,6 +17,7 @@
         <netty.version>4.1.44.FINAL</netty.version>
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <spring.framework.version>5.2.2.RELEASE</spring.framework.version>
+        <kryo.version>4.0.2</kryo.version>
     </properties>
 
     <dependencies>
@@ -34,7 +35,15 @@
             <version>${spring.framework.version}</version>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+        <!-- kryo序列化（shaded版本自带 ASM，防止冲突） -->
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo-shaded</artifactId>
+            <version>${kryo.version}</version>
+        </dependency>
+
+
+        <!-- SLF4J -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
