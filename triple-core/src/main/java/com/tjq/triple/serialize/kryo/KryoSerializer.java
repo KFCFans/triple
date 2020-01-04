@@ -24,7 +24,7 @@ public class KryoSerializer implements Serializer {
         Kryo kryo = kryoLocal.get();
         try(
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                Output output = new Output(byteArrayOutputStream);
+                Output output = new Output(byteArrayOutputStream)
         ) {
             kryo.writeClassAndObject(output, obj);
             return byteArrayOutputStream.toByteArray();
@@ -40,7 +40,7 @@ public class KryoSerializer implements Serializer {
         Kryo kryo = kryoLocal.get();
         try (
                 ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
-                Input input = new Input(byteArrayInputStream);
+                Input input = new Input(byteArrayInputStream)
         ) {
             return (T) kryo.readClassAndObject(input);
         }catch (Exception e) {

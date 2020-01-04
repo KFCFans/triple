@@ -13,7 +13,6 @@ import lombok.Setter;
  */
 @Setter
 @Getter
-@NoArgsConstructor
 public class TripleRpcRequest implements TripleTransportObject {
 
     private static final long serialVersionUID = 1L;
@@ -26,5 +25,10 @@ public class TripleRpcRequest implements TripleTransportObject {
     private Class<?>[] parameterTypes;
     private Object[] parameters;
 
+    @Getter
     private TripleRpcContext context;
+
+    public TripleRpcRequest() {
+        context = new TripleRpcContext();
+    }
 }
