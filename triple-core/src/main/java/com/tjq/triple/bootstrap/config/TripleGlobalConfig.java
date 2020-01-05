@@ -1,5 +1,6 @@
 package com.tjq.triple.bootstrap.config;
 
+import com.tjq.triple.common.enums.TripleRemoteProtocol;
 import com.tjq.triple.common.enums.TripleSerializerType;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,18 +15,36 @@ import java.util.concurrent.Executor;
  * @author tjq
  * @since 2020/1/5
  */
-@Setter
 public final class TripleGlobalConfig {
 
     /**
      * 序列化方式
      */
+    @Setter
     @Getter
-    private static TripleSerializerType serializerType;
-
+    private static TripleSerializerType serializerType = TripleSerializerType.KRYO;
+    /**
+     * 通讯方式
+     */
+    @Setter
+    @Getter
+    private static TripleRemoteProtocol protocol = TripleRemoteProtocol.TRIPLE_NETTY;
+    /**
+     * RPC 超时时间
+     */
+    @Setter
+    @Getter
+    private static int timeoutMS = 2000;
+    /**
+     * RPC 调用失败重试次数
+     */
+    @Setter
+    @Getter
+    private static int retryTimes = 3;
     /**
      * 本地服务执行的线程池（可选，默认配置为 CPU核心数*2, 200, 60S）
      */
+    @Setter
     @Getter
     private static Executor localInvokerPool;
 

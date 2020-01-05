@@ -1,17 +1,21 @@
 package com.tjq.triple.consumer;
 
 import com.google.common.collect.Lists;
+import com.tjq.triple.bootstrap.config.TripleGlobalConfig;
 import com.tjq.triple.bootstrap.config.TripleRegistryConfig;
 import com.tjq.triple.common.enums.TripleInvokeType;
+import com.tjq.triple.common.enums.TripleRegisterType;
 import com.tjq.triple.common.enums.TripleRemoteProtocol;
 import com.tjq.triple.common.exception.TripleRpcException;
 import com.tjq.triple.consumer.response.FuturePool;
 import com.tjq.triple.consumer.response.TripleFuture;
+import com.tjq.triple.protocol.TripleProtocol;
 import com.tjq.triple.protocol.rpc.TripleRpcRequest;
 import com.tjq.triple.protocol.rpc.TripleRpcResponse;
 import com.tjq.triple.transport.Transporter;
 import com.tjq.triple.transport.TransporterPool;
 import com.tjq.triple.transport.netty4.NettyClientBootstrap;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
 
@@ -29,35 +33,42 @@ import java.util.concurrent.*;
 public class TripleReferenceBean<T> {
 
     private transient volatile T ref;
-    private transient volatile boolean initialized;
 
     // 注册中心配置
+    @Setter
     private TripleRegistryConfig registryConfig;
 
-    private long timeout;
     private String groupName;
     private String version;
     private Class<?> interfaceClass;
     private String interfaceName;
     // 同步/异步
     private TripleInvokeType invokeType;
-    // 通讯方式
-    private TripleRemoteProtocol protocol;
+
 
     public TripleReferenceBean() {
-        initialized = false;
 
         groupName = "Triple";
         version = "1.0.0";
         invokeType = TripleInvokeType.SYNC;
-        protocol = TripleRemoteProtocol.TRIPLE_NETTY;
     }
 
-    public Object get() throws Exception{
-        // 初始化连接
-        initConnection();
-        // 生成代理对象
-        return genProxyObject();
+    @SuppressWarnings("unchecked")
+    public T get() throws Exception{
+
+        if (ref == null) {
+            synchronized (this) {
+                if (ref == null) {
+                    // 参数校验
+                    check();
+                    // 初始化连接
+                    initConnection();
+                    // 生成代理对象
+                    ref = (T) genProxyObject();
+                }
+            }
+        }
+        return ref;
     }
 
     private void initConnection() {
@@ -70,7 +81,7 @@ public class TripleReferenceBean<T> {
                 if (TransporterPool.hasAvailableTransporter()) {
                     return;
                 }
-                // TODO：初始化连接
+                // TODO：连接 ZK & 读取 provider 信息 & 读取配置信息（序列化方式等）
                 return;
             case DIRECT:
                 registryConfig.getAddressList().forEach(ads -> {
@@ -87,10 +98,12 @@ public class TripleReferenceBean<T> {
             String[] split = targetAddress.split(":");
             String ip = split[0];
             int port = Integer.parseInt(split[1]);
-            switch (protocol) {
+            switch (TripleGlobalConfig.getProtocol()) {
                 case TRIPLE_NETTY:
                     NettyClientBootstrap nettyClient = new NettyClientBootstrap(ip, port);
                     nettyClient.start();
+                    break;
+                case TRIPLE_HTTP:
             }
         });
     }
@@ -131,22 +144,43 @@ public class TripleReferenceBean<T> {
             TripleFuture tripleFuture = FuturePool.push(rpcRequest);
 
             // 3. 发送 RPC 网络请求
+            Transporter transporter = null;
+            if (registryConfig.getRegisterType() == TripleRegisterType.DIRECT) {
+                for (String ads : registryConfig.getAddressList()) {
+                    transporter = TransporterPool.getTransporter(ads);
+                    if (transporter != null) {
+                        break;
+                    }
+                }
+            }else {
+                transporter = TransporterPool.getTransporter();
+            }
+            if (transporter == null) {
+                transporter = TransporterPool.reConnected();
+            }
+            transporter.sendAsync(TripleProtocol.buildRpcRequest(rpcRequest));
 
             // 4. 处理返回结果
             switch (invokeType) {
                 case SYNC:
                     // 超时会抛出异常，继续向外抛
-                    TripleRpcResponse response = tripleFuture.get(timeout, TimeUnit.MILLISECONDS);
-                    if (TripleRpcResponse.SUCCESS == response.getCode()) {
-                        return response.getResult();
+                    TripleRpcResponse response = tripleFuture.get(TripleGlobalConfig.getTimeoutMS(), TimeUnit.MILLISECONDS);
+                    switch (response.getCode()) {
+                        case TripleRpcResponse.SUCCESS : return response.getResult();
+                        case TripleRpcResponse.INVOKE_SUCCESS_EXECUTE_FAILED: throw response.getThrowable();
                     }
-                    throw response.getThrowable();
 
-                // 异步模式下，直接强转返回值为 TripleFuture 即可
+                // 异步模式下，返回 null，通过工具类获取 Future
                 case ASYNC:
-                    return tripleFuture;
+                    return null;
             }
             throw new TripleRpcException("invokeType can't be null");
         }));
+    }
+
+    private void check() {
+        if (registryConfig == null) {
+            throw new TripleRpcException("please set register info");
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.tjq.triple.transport;
 
 import com.google.common.collect.Maps;
+import com.tjq.triple.transport.netty4.NettyTransporter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.Map;
@@ -49,6 +50,17 @@ public class TransporterPool {
         return address2Transporter.get(address);
     }
 
+    public static Transporter getTransporter() {
+        for (Transporter tsp : address2Transporter.values()) {
+            if (tsp.available()) {
+                return tsp;
+            }
+        }
+
+        // TODO：重新获取可用连接
+        return null;
+    }
+
     /**
      * 指定远程地址是否存在连接器（适用于指定 IP 调用的情况）
      */
@@ -71,5 +83,12 @@ public class TransporterPool {
             }
         }
         return false;
+    }
+
+    /**
+     * 根据注册中心配置重新连接
+     */
+    public static Transporter reConnected() {
+        return new NettyTransporter(null);
     }
 }

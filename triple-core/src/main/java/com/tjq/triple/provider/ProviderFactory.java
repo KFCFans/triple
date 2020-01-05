@@ -27,7 +27,7 @@ public abstract class ProviderFactory {
 
     protected abstract Collection<Object> providerBeans();
 
-    private void init() {
+    public void init() {
         if (initialized) {
             return;
         }
