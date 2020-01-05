@@ -28,6 +28,23 @@ public class TransporterPool {
         log.info("[Triple] remote client(address={}) connected", remoteAddress);
     }
 
+    /**
+     * 删除传输器
+     */
+    public static void removeTransporter(Transporter transporter) {
+        String remoteAddress = transporter.remoteAddress();
+        Transporter tsp = address2Transporter.get(remoteAddress);
+        if (tsp == null) {
+            return;
+        }
+        address2Transporter.remove(remoteAddress);
+        if (!tsp.available()) {
+            log.warn("[Triple] remote client(address={}) disconnected because of channel inactive", remoteAddress);
+        }else {
+            log.info("[Triple] remove remote client(address={})", remoteAddress);
+        }
+    }
+
     public static Transporter getTransporter(String address) {
         return address2Transporter.get(address);
     }

@@ -1,17 +1,14 @@
 package com.tjq.triple.consumer;
 
 import com.google.common.collect.Lists;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.tjq.triple.bootstrap.config.TripleRegistryConfig;
 import com.tjq.triple.common.enums.TripleInvokeType;
 import com.tjq.triple.common.enums.TripleRemoteProtocol;
-import com.tjq.triple.common.enums.TripleSerializerType;
 import com.tjq.triple.common.exception.TripleRpcException;
 import com.tjq.triple.consumer.response.FuturePool;
 import com.tjq.triple.consumer.response.TripleFuture;
 import com.tjq.triple.protocol.rpc.TripleRpcRequest;
 import com.tjq.triple.protocol.rpc.TripleRpcResponse;
-import com.tjq.triple.serialize.Serializer;
 import com.tjq.triple.transport.Transporter;
 import com.tjq.triple.transport.TransporterPool;
 import com.tjq.triple.transport.netty4.NettyClientBootstrap;
@@ -46,30 +43,14 @@ public class TripleReferenceBean<T> {
     private TripleInvokeType invokeType;
     // 通讯方式
     private TripleRemoteProtocol protocol;
-    // 序列化方式
-    private TripleSerializerType serializerType;
-
-    // provider 线程池
-    private Executor providerPool;
 
     public TripleReferenceBean() {
+        initialized = false;
+
         groupName = "Triple";
         version = "1.0.0";
         invokeType = TripleInvokeType.SYNC;
         protocol = TripleRemoteProtocol.TRIPLE_NETTY;
-        serializerType = TripleSerializerType.KRYO;
-
-        // 默认线程池
-        ThreadFactory threadFactory = new ThreadFactoryBuilder()
-                .setNameFormat("triple-pool-%d")
-                .setUncaughtExceptionHandler((t, e) -> log.error("[Triple] execute failed", e))
-                .build();
-        providerPool = new ThreadPoolExecutor(
-                8,
-                200,
-                60, TimeUnit.SECONDS,
-                new SynchronousQueue<>(), threadFactory,
-                new ThreadPoolExecutor.AbortPolicy());
     }
 
     public Object get() throws Exception{
@@ -101,17 +82,14 @@ public class TripleReferenceBean<T> {
 
         }
 
-        // 2. 初始化序列化组件
-        Serializer serializer = serializerType.getInstance();
-
-        // 建立连接
+        // 2. 建立连接
         needConnectionAddress.forEach(targetAddress -> {
             String[] split = targetAddress.split(":");
             String ip = split[0];
             int port = Integer.parseInt(split[1]);
             switch (protocol) {
                 case TRIPLE_NETTY:
-                    NettyClientBootstrap nettyClient = new NettyClientBootstrap(ip, port, serializer, providerPool);
+                    NettyClientBootstrap nettyClient = new NettyClientBootstrap(ip, port);
                     nettyClient.start();
             }
         });

@@ -5,11 +5,10 @@ import com.tjq.triple.protocol.TripleProtocol;
 import com.tjq.triple.protocol.rpc.TripleRpcRequest;
 import com.tjq.triple.protocol.rpc.TripleRpcResponse;
 import com.tjq.triple.provider.ProviderFactory;
+import com.tjq.triple.provider.ProviderThreadPool;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.concurrent.Executor;
 
@@ -20,15 +19,22 @@ import java.util.concurrent.Executor;
  * @since 2020/1/3
  */
 @Slf4j
-@AllArgsConstructor
 public class NettyRpcRequestHandler extends SimpleChannelInboundHandler<TripleRpcRequest> {
 
     private final Executor pool;
 
+    public NettyRpcRequestHandler() {
+        pool = ProviderThreadPool.getPool();
+    }
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TripleRpcRequest msg) throws Exception {
         // writeAndFlush 为异步操作，异常处理放在 Transport 层实现
-        pool.execute(() -> ctx.writeAndFlush(TripleProtocol.buildRpcResponse(invoke(msg))));
+        try {
+            pool.execute(() -> ctx.writeAndFlush(TripleProtocol.buildRpcResponse(invoke(msg))));
+        }catch (Exception e) {
+            log.error("[Triple] submit job(className={}&method={}) to thread poll failed.", msg.getClassName(), msg.getMethodName(), e);
+        }
     }
 
     @Override

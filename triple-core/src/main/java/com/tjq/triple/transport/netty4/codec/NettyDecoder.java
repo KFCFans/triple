@@ -3,11 +3,10 @@ package com.tjq.triple.transport.netty4.codec;
 import com.tjq.triple.protocol.TripleProtocol;
 import com.tjq.triple.protocol.TripleRpcCMD;
 import com.tjq.triple.protocol.TripleTransportObject;
-import com.tjq.triple.serialize.Serializer;
+import com.tjq.triple.serialize.SerializerFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
-import lombok.AllArgsConstructor;
 
 import java.util.List;
 
@@ -18,10 +17,8 @@ import java.util.List;
  * @author tjq
  * @since 2020/1/3
  */
-@AllArgsConstructor
 public class NettyDecoder extends ByteToMessageDecoder {
 
-    private Serializer serializer;
     // 协议首部定长 8字节
     private static final int PROTOCOL_HEAD_LENGTH = 8;
 
@@ -52,6 +49,7 @@ public class NettyDecoder extends ByteToMessageDecoder {
 
         // 序列化
         Class<? extends TripleTransportObject> clazz = TripleRpcCMD.of(cmd).getClazz();
-        out.add(serializer.deserialize(data, clazz));
+        out.add(SerializerFactory.getSerializer().deserialize(data, clazz));
     }
+
 }

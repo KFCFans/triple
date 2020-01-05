@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class NettyRpcResponseHandler extends SimpleChannelInboundHandler<TripleRpcResponse> {
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TripleRpcResponse response) throws Exception {
         TripleFuture tripleFuture = FuturePool.get(response.getRequestId());
