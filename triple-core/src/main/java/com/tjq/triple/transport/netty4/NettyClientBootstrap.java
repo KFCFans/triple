@@ -1,5 +1,7 @@
 package com.tjq.triple.transport.netty4;
 
+import com.tjq.triple.transport.Transporter;
+import com.tjq.triple.transport.TransporterPool;
 import com.tjq.triple.transport.netty4.handler.NettyChannelInitializer;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
@@ -42,11 +44,13 @@ public class NettyClientBootstrap {
         started = true;
         // 连接 server
         try {
-            ChannelFuture channel = client.connect(serverIp, serverPort);
-
+            ChannelFuture future = client.connect(serverIp, serverPort).sync();
+            log.info("[TripleClient] netty client connect to {}:{} success", serverIp, serverPort);
             // 阻塞在这里，直到通道关闭
-            channel.sync();
-            channel.channel().closeFuture().sync();
+            Transporter transporter = new NettyTransporter(future.channel());
+            TransporterPool.addTransporter(transporter);
+//            channel.sync();
+//            channel.channel().closeFuture().sync();
         }catch (Exception e) {
             started = false;
             log.error("[TripleClient] netty client startup failed.", e);

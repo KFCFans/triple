@@ -34,10 +34,9 @@ public class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
      */
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        super.channelActive(ctx);
-
         Transporter transporter = new NettyTransporter(ctx.channel());
         TransporterPool.addTransporter(transporter);
+        super.channelActive(ctx);
     }
 
     /**
@@ -45,9 +44,14 @@ public class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        super.channelInactive(ctx);
-
         Transporter transporter = new NettyTransporter(ctx.channel());
         TransporterPool.removeTransporter(transporter);
+        super.channelInactive(ctx);
+    }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("[Triple]", cause);
+        super.exceptionCaught(ctx, cause);
     }
 }

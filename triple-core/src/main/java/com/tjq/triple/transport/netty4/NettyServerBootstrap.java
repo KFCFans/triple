@@ -1,5 +1,7 @@
 package com.tjq.triple.transport.netty4;
 
+import com.tjq.triple.transport.Transporter;
+import com.tjq.triple.transport.TransporterPool;
 import com.tjq.triple.transport.netty4.handler.NettyChannelInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -46,9 +48,10 @@ public class NettyServerBootstrap {
                 .childHandler(new NettyChannelInitializer());
         started = true;
         try {
-            ChannelFuture channelFuture = server.bind(ip, port).sync();
-            Channel channel = channelFuture.channel();
-            channel.closeFuture().sync();
+            ChannelFuture future = server.bind(ip, port).sync();
+            log.info("[TripleServer] netty server startup in address({}:{})", ip, port);
+            // 阻塞到应用关闭
+            future.channel().closeFuture().sync();
         }catch (Exception e) {
             started = false;
             stop();

@@ -8,6 +8,7 @@ import com.tjq.triple.common.utils.NetUtils;
 import com.tjq.triple.provider.SpringProviderFactory;
 import com.tjq.triple.transport.netty4.NettyServerBootstrap;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
@@ -19,21 +20,28 @@ import org.springframework.context.ApplicationContextAware;
  * @author tjq
  * @since 2020/1/5
  */
+@Slf4j
 @Setter
-public class ServiceBootstrap implements InitializingBean, ApplicationContextAware {
+public class TripleServerBootstrap implements InitializingBean, ApplicationContextAware {
 
-    private int port;
+    private Integer port;
     private TripleRegistryConfig registryConfig;
 
     public void start() {
+        long s = System.currentTimeMillis();
         check();
         register();
         startService();
+        long usedTime = System.currentTimeMillis() - s;
+        log.info("[Triple] server start up successfully, using {} ms.", usedTime);
     }
 
     private void check() {
         if (registryConfig == null) {
             throw new TripleRpcException("please set register info");
+        }
+        if (port == null) {
+            throw new TripleRpcException("please set the port");
         }
     }
     private void register() {

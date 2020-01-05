@@ -26,10 +26,10 @@ public final class SerializerFactory {
                 if (serializer == null) {
 
                     switch (TripleGlobalConfig.getSerializerType()) {
-                        case KRYO: serializer = new KryoSerializer();
-                        case FAST_JSON: serializer = new FastJsonSerializer();
+                        case KRYO: serializer = new KryoSerializer();break;
+                        case FAST_JSON: serializer = new FastJsonSerializer();break;
+                        default: serializer = new JavaSerializer();break;
                     }
-                    serializer = new JavaSerializer();
                 }
             }
         }

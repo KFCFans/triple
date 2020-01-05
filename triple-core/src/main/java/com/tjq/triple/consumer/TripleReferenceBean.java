@@ -5,7 +5,6 @@ import com.tjq.triple.bootstrap.config.TripleGlobalConfig;
 import com.tjq.triple.bootstrap.config.TripleRegistryConfig;
 import com.tjq.triple.common.enums.TripleInvokeType;
 import com.tjq.triple.common.enums.TripleRegisterType;
-import com.tjq.triple.common.enums.TripleRemoteProtocol;
 import com.tjq.triple.common.exception.TripleRpcException;
 import com.tjq.triple.consumer.response.FuturePool;
 import com.tjq.triple.consumer.response.TripleFuture;
@@ -37,12 +36,16 @@ public class TripleReferenceBean<T> {
     // 注册中心配置
     @Setter
     private TripleRegistryConfig registryConfig;
-
+    @Setter
     private String groupName;
+    @Setter
     private String version;
+    @Setter
     private Class<?> interfaceClass;
+    @Setter
     private String interfaceName;
     // 同步/异步
+    @Setter
     private TripleInvokeType invokeType;
 
 
@@ -82,7 +85,7 @@ public class TripleReferenceBean<T> {
                     return;
                 }
                 // TODO：连接 ZK & 读取 provider 信息 & 读取配置信息（序列化方式等）
-                return;
+                break;
             case DIRECT:
                 registryConfig.getAddressList().forEach(ads -> {
                     Transporter transporter = TransporterPool.getTransporter(ads);
@@ -169,6 +172,7 @@ public class TripleReferenceBean<T> {
                         case TripleRpcResponse.SUCCESS : return response.getResult();
                         case TripleRpcResponse.INVOKE_SUCCESS_EXECUTE_FAILED: throw response.getThrowable();
                     }
+                    break;
 
                 // 异步模式下，返回 null，通过工具类获取 Future
                 case ASYNC:
