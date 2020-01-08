@@ -46,6 +46,13 @@ public final class TripleGlobalConfig {
      */
     @Setter
     @Getter
-    private static Executor localInvokerPool;
+    private static int invokerPoolCoreSize = Runtime.getRuntime().availableProcessors() * 2;
+    @Setter
+    @Getter
+    private static int invokerPoolMaxSize = 200;
+    @Setter
+    @Getter
+    private static int invokerPoolKeepAliveTimeMS = 60000;
+
 
 }

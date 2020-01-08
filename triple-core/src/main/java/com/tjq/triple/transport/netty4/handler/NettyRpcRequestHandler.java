@@ -1,6 +1,5 @@
 package com.tjq.triple.transport.netty4.handler;
 
-import com.tjq.triple.common.exception.ProviderExecuteException;
 import com.tjq.triple.protocol.TripleProtocol;
 import com.tjq.triple.protocol.rpc.TripleRpcRequest;
 import com.tjq.triple.protocol.rpc.TripleRpcResponse;
@@ -11,6 +10,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 
 /**
  * RPC 请求处理
@@ -32,8 +32,12 @@ public class NettyRpcRequestHandler extends SimpleChannelInboundHandler<TripleRp
         // writeAndFlush 为异步操作，异常处理放在 Transport 层实现
         try {
             pool.execute(() -> ctx.writeAndFlush(TripleProtocol.buildRpcResponse(invoke(msg))));
-        }catch (Exception e) {
-            log.error("[Triple] submit job(className={}&method={}) to thread poll failed.", msg.getClassName(), msg.getMethodName(), e);
+        } catch (RejectedExecutionException re) {
+            log.warn("[Triple] thread pool is full load, request will be drop");
+
+            // 线程池满，启动负载均衡策略
+            TripleRpcResponse response = TripleRpcResponse.failed(msg.getContext().getRequestId(), TripleRpcResponse.PROVIDER_OVERLOAD, re);
+            ctx.writeAndFlush(TripleProtocol.buildRpcResponse(response));
         }
     }
 
@@ -44,6 +48,9 @@ public class NettyRpcRequestHandler extends SimpleChannelInboundHandler<TripleRp
         ctx.close();
     }
 
+    /**
+     * 本地调用，包装结果
+     */
     private TripleRpcResponse invoke(TripleRpcRequest rpcRequest) {
 
         String group = rpcRequest.getGroup();
@@ -62,7 +69,7 @@ public class NettyRpcRequestHandler extends SimpleChannelInboundHandler<TripleRp
             response.setResult(res);
         }catch (Throwable t) {
             response.setCode(TripleRpcResponse.INVOKE_SUCCESS_EXECUTE_FAILED);
-            response.setThrowable(new ProviderExecuteException(t));
+            response.setThrowable(t);
         }
         return response;
     }

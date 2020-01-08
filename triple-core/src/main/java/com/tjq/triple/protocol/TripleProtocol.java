@@ -5,6 +5,7 @@ import com.tjq.triple.protocol.rpc.TripleRpcResponse;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -16,6 +17,7 @@ import java.io.Serializable;
  */
 @Setter
 @Getter
+@ToString
 @NoArgsConstructor
 public class TripleProtocol implements Serializable {
 

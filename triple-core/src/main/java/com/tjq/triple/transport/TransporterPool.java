@@ -1,9 +1,14 @@
 package com.tjq.triple.transport;
 
 import com.google.common.collect.Maps;
+import com.tjq.triple.bootstrap.config.TripleRegistryConfig;
+import com.tjq.triple.common.enums.TripleRegisterType;
+import com.tjq.triple.common.exception.TripleRpcException;
 import com.tjq.triple.transport.netty4.NettyTransporter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.util.CollectionUtils;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,8 +61,6 @@ public class TransporterPool {
                 return tsp;
             }
         }
-
-        // TODO：重新获取可用连接
         return null;
     }
 
@@ -83,12 +86,5 @@ public class TransporterPool {
             }
         }
         return false;
-    }
-
-    /**
-     * 根据注册中心配置重新连接
-     */
-    public static Transporter reConnected() {
-        return new NettyTransporter(null);
     }
 }

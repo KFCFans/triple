@@ -3,15 +3,15 @@ package com.tjq.triple.bootstrap.annotation;
 import java.lang.annotation.*;
 
 /**
- * 声明为 RPC 服务消费者
+ * 声明为 RPC 双向服务消费者（Server端使用）
  *
  * @author tjq
- * @since 2020/1/2
+ * @since 2020/1/6
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.METHOD, ElementType.ANNOTATION_TYPE})
-public @interface TripleConsumer {
+@Target({ElementType.TYPE})
+public @interface TripleDuplexConsumer {
 
     /**
      * Interface class, default value is void.class
@@ -24,22 +24,7 @@ public @interface TripleConsumer {
     String interfaceName() default "";
 
     /**
-     * Service version, default value is empty string
-     */
-    String version() default "";
-
-    /**
-     * Service group, default value is empty string
-     */
-    String group() default "";
-
-    /**
      * Timeout value for service invocation, default value is 0
      */
     int timeout() default 0;
-
-    /**
-     * Whether to enable async invocation, default value is false
-     */
-    boolean async() default false;
 }

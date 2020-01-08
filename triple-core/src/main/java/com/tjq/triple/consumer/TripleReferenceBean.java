@@ -3,7 +3,6 @@ package com.tjq.triple.consumer;
 import com.google.common.collect.Lists;
 import com.tjq.triple.bootstrap.config.TripleGlobalConfig;
 import com.tjq.triple.bootstrap.config.TripleRegistryConfig;
-import com.tjq.triple.common.enums.TripleInvokeType;
 import com.tjq.triple.common.enums.TripleRegisterType;
 import com.tjq.triple.common.exception.TripleRpcException;
 import com.tjq.triple.consumer.response.FuturePool;
@@ -46,14 +45,14 @@ public class TripleReferenceBean<T> {
     private String interfaceName;
     // 同步/异步
     @Setter
-    private TripleInvokeType invokeType;
+    private boolean async;
 
 
     public TripleReferenceBean() {
 
         groupName = "Triple";
         version = "1.0.0";
-        invokeType = TripleInvokeType.SYNC;
+        async = false;
     }
 
     @SuppressWarnings("unchecked")
@@ -159,26 +158,24 @@ public class TripleReferenceBean<T> {
                 transporter = TransporterPool.getTransporter();
             }
             if (transporter == null) {
-                transporter = TransporterPool.reConnected();
+                // TODO：重连（直接调用 initConnection ？）
             }
             transporter.sendAsync(TripleProtocol.buildRpcRequest(rpcRequest));
 
             // 4. 处理返回结果
-            switch (invokeType) {
-                case SYNC:
-                    // 超时会抛出异常，继续向外抛
-                    TripleRpcResponse response = tripleFuture.get(TripleGlobalConfig.getTimeoutMS(), TimeUnit.MILLISECONDS);
-                    switch (response.getCode()) {
-                        case TripleRpcResponse.SUCCESS : return response.getResult();
-                        case TripleRpcResponse.INVOKE_SUCCESS_EXECUTE_FAILED: throw response.getThrowable();
-                    }
-                    break;
-
-                // 异步模式下，返回 null，通过工具类获取 Future
-                case ASYNC:
+            if (async) {
+                return null;
+            }
+            // 超时会抛出异常，继续向外抛
+            TripleRpcResponse response = tripleFuture.get(TripleGlobalConfig.getTimeoutMS(), TimeUnit.MILLISECONDS);
+            switch (response.getCode()) {
+                case TripleRpcResponse.SUCCESS : return response.getResult();
+                case TripleRpcResponse.INVOKE_SUCCESS_EXECUTE_FAILED: throw response.getThrowable();
+                default:
+                    // 启动集群容错模式
                     return null;
             }
-            throw new TripleRpcException("invokeType can't be null");
+
         }));
     }
 

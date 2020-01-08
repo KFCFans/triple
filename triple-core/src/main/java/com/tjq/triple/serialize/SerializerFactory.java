@@ -4,6 +4,7 @@ import com.tjq.triple.bootstrap.config.TripleGlobalConfig;
 import com.tjq.triple.serialize.java.JavaSerializer;
 import com.tjq.triple.serialize.json.FastJsonSerializer;
 import com.tjq.triple.serialize.kryo.KryoSerializer;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * 序列化器工厂
@@ -12,6 +13,7 @@ import com.tjq.triple.serialize.kryo.KryoSerializer;
  * @author tjq
  * @since 2020/1/5
  */
+@Slf4j
 public final class SerializerFactory {
 
     private static volatile Serializer serializer;
@@ -30,6 +32,7 @@ public final class SerializerFactory {
                         case FAST_JSON: serializer = new FastJsonSerializer();break;
                         default: serializer = new JavaSerializer();break;
                     }
+                    log.info("[Triple] initialized the serializer({}) successful", serializer);
                 }
             }
         }

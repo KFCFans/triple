@@ -23,35 +23,10 @@ public class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ch.pipeline()
+                .addLast(new NettyChannelDuplexHandler())
                 .addLast(new NettyDecoder())
                 .addLast(new NettyEncoder())
                 .addLast(new NettyRpcRequestHandler())
                 .addLast(new NettyRpcResponseHandler());
-    }
-
-    /**
-     * channel 活跃的回调
-     */
-    @Override
-    public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        Transporter transporter = new NettyTransporter(ctx.channel());
-        TransporterPool.addTransporter(transporter);
-        super.channelActive(ctx);
-    }
-
-    /**
-     * channel 不活跃的回调
-     */
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Transporter transporter = new NettyTransporter(ctx.channel());
-        TransporterPool.removeTransporter(transporter);
-        super.channelInactive(ctx);
-    }
-
-    @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.error("[Triple]", cause);
-        super.exceptionCaught(ctx, cause);
     }
 }

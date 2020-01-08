@@ -28,6 +28,11 @@
         <slf4j-api.version>1.7.30</slf4j-api.version>
         <spring.framework.version>5.2.2.RELEASE</spring.framework.version>
         <kryo.version>4.0.2</kryo.version>
+        <curator.zk.version>4.2.0</curator.zk.version>
+        <fastjson.version>1.2.62</fastjson.version>
+        <junit.version>5.5.2</junit.version>
+
+        <!-- optional dependencies -->
     </properties>
 
     <dependencies>
@@ -52,13 +57,35 @@
             <version>${kryo.version}</version>
         </dependency>
 
-
         <!-- SLF4J -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j-api.version}</version>
         </dependency>
+
+        <!-- FastJSON -->
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${fastjson.version}</version>
+        </dependency>
+
+        <!-- zookeeper 注册中心 -->
+        <dependency>
+            <groupId>org.apache.curator</groupId>
+            <artifactId>curator-recipes</artifactId>
+            <version>${curator.zk.version}</version>
+        </dependency>
+
+        <!-- 测试框架 Junit5 -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit.version}</version>
+            <scope>test</scope>
+        </dependency>
+
 
 
     </dependencies>

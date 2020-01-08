@@ -1,5 +1,6 @@
 package com.tjq.triple.serialize.json;
 
+import com.alibaba.fastjson.JSON;
 import com.tjq.triple.serialize.Serializer;
 
 /**
@@ -12,11 +13,11 @@ public class FastJsonSerializer implements Serializer {
 
     @Override
     public <T> byte[] serialize(T obj) {
-        return new byte[0];
+        return JSON.toJSONBytes(obj);
     }
 
     @Override
     public <T> T deserialize(byte[] bytes, Class<T> clazz) {
-        return null;
+        return JSON.parseObject(bytes, clazz);
     }
 }

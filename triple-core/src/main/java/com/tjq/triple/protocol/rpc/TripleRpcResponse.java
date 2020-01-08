@@ -33,4 +33,15 @@ public class TripleRpcResponse implements TripleTransportObject {
     public static final short INVOKE_SUCCESS_EXECUTE_FAILED = 201;
     // 4XX：调用失败，比如网络原因导致TCP连接断开等
     public static final short INVOKE_FAILED = 400;
+    // 5XX：远程服务器（provider）异常
+    public static final short PROVIDER_OVERLOAD = 500;
+    public static final short PROVIDER_UNKNOWN_EXCEPTION = 555;
+
+    public static TripleRpcResponse failed(long requestId, short code, Throwable t) {
+        TripleRpcResponse response = new TripleRpcResponse();
+        response.setRequestId(requestId);
+        response.setCode(code);
+        response.setThrowable(t);
+        return response;
+    }
 }
