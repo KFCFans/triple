@@ -1,7 +1,5 @@
-package com.tjq.triple.transport.netty4;
+package com.tjq.triple.transport.netty4.server;
 
-import com.tjq.triple.transport.Transporter;
-import com.tjq.triple.transport.TransporterPool;
 import com.tjq.triple.transport.netty4.handler.NettyChannelInitializer;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
@@ -10,13 +8,13 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Netty Server 服务器
+ * Netty Server 服务器（监听某个端口的连接请求 & 处理请求数据）
  *
  * @author tjq
  * @since 2020/1/3
  */
 @Slf4j
-public class NettyServerBootstrap {
+public class NettyServer {
 
     /**
      * config info
@@ -24,7 +22,7 @@ public class NettyServerBootstrap {
     private final String ip;
     private final int port;
 
-    public NettyServerBootstrap(String ip, int port) {
+    public NettyServer(String ip, int port) {
         this.ip = ip;
         this.port = port;
     }
@@ -45,7 +43,7 @@ public class NettyServerBootstrap {
                 .option(ChannelOption.SO_BACKLOG, 128)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .childOption(ChannelOption.TCP_NODELAY, true)
-                .childHandler(new NettyChannelInitializer());
+                .childHandler(new NettyChannelInitializer(false));
         started = true;
         try {
             ChannelFuture future = server.bind(ip, port).sync();

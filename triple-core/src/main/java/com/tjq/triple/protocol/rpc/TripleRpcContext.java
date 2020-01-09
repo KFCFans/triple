@@ -30,6 +30,10 @@ public class TripleRpcContext implements TripleTransportObject {
      * 分布式唯一ID，调用方若有链路追踪的需求则自行传入
      */
     private String traceId;
+    /**
+     * 该请求的重试次数
+     */
+    private Integer retryTimes;
     private Long startTime;
     private String version;
 
@@ -39,6 +43,7 @@ public class TripleRpcContext implements TripleTransportObject {
         requestId = UniqueIDGenerator.allocate();
         startTime = System.currentTimeMillis();
         version = "triple:1.0.0";
+        retryTimes = 0;
     }
 
     public void addContext(String key, Object value) {

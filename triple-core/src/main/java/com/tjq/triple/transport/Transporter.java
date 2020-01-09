@@ -9,7 +9,7 @@ import com.tjq.triple.protocol.rpc.TripleRpcRequest;
 import com.tjq.triple.protocol.rpc.TripleRpcResponse;
 
 /**
- * 连接器
+ * 传输层，负责发送数据
  *
  * @author tjq
  * @since 2020/1/3
@@ -46,9 +46,5 @@ public interface Transporter {
         if (future != null) {
             future.finishedInvoke(response);
         }
-    }
-
-    default String genAddress(String ip, int port) {
-        return String.format("%s:%d", ip, port);
     }
 }

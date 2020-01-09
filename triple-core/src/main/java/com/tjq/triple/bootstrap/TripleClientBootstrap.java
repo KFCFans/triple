@@ -22,6 +22,7 @@ import org.springframework.util.ReflectionUtils;
  */
 @Slf4j
 public class TripleClientBootstrap extends InstantiationAwareBeanPostProcessorAdapter implements InitializingBean, ApplicationContextAware, BeanFactoryAware {
+
     @Override
     public void afterPropertiesSet() throws Exception {
     }

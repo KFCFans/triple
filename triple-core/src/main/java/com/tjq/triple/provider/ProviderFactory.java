@@ -1,15 +1,20 @@
 package com.tjq.triple.provider;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.tjq.triple.bootstrap.annotation.TripleProvider;
+import com.tjq.triple.bootstrap.config.TripleGlobalConfig;
 import com.tjq.triple.common.exception.TripleRpcException;
 import com.tjq.triple.provider.invoker.JDKReflectInvoker;
 import com.tjq.triple.provider.invoker.LocalInvoker;
+import com.tjq.triple.registry.ProviderBeanInfo;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,6 +29,9 @@ public abstract class ProviderFactory {
     private static volatile boolean initialized = false;
     // group_version -> (className -> invoker)
     private static final Map<String, Map<String, LocalInvoker>> providerData = Maps.newHashMap();
+    // 调用者信息，用来服务注册
+    @Getter
+    private static final List<ProviderBeanInfo> providerBeanInfos = Lists.newLinkedList();
 
     protected abstract Collection<Object> providerBeans();
 
@@ -39,14 +47,27 @@ public abstract class ProviderFactory {
         }
         beans.forEach(bean -> {
             TripleProvider tripleProvider = bean.getClass().getAnnotation(TripleProvider.class);
+
+            String serviceName = genServiceInterfaceName(tripleProvider);
+
             String serviceUniqueKey = genServiceKey(tripleProvider.group(), tripleProvider.version());
             Map<String, LocalInvoker> ifName2PB = providerData.computeIfAbsent(serviceUniqueKey, ignore -> Maps.newHashMap());
-            ifName2PB.put(genServiceInterfaceName(tripleProvider), genProxy(bean));
+            ifName2PB.put(serviceName, genProxy(bean));
+
+            ProviderBeanInfo providerBeanInfo = ProviderBeanInfo.builder()
+                    .group(tripleProvider.group())
+                    .version(tripleProvider.version())
+                    .serviceName(serviceName)
+                    .build();
+            providerBeanInfos.add(providerBeanInfo);
         });
         log.info("[TripleProvider] triple finds {} provider successfully.", beans.size());
         initialized = true;
     }
 
+    /**
+     * 反射调用
+     */
     public static Object invoke(String group, String version, String className, String methodName, Class<?>[] parameterTypes, Object[] parameters) throws Exception {
 
         if (!initialized) {
@@ -65,7 +86,6 @@ public abstract class ProviderFactory {
         }
         return invoker.invoke(methodName, parameterTypes, parameters);
     }
-
 
     /**
      * 生成一级索引：group + version

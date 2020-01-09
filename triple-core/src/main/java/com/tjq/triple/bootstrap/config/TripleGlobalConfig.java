@@ -34,7 +34,7 @@ public final class TripleGlobalConfig {
      */
     @Setter
     @Getter
-    private static int timeoutMS = 2000;
+    private static long timeoutMS = 2000;
     /**
      * RPC 调用失败重试次数
      */

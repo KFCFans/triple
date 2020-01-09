@@ -65,7 +65,7 @@ public class ZKRegister implements Register {
                             .withMode(CreateMode.EPHEMERAL)
                             .forPath(path, JSON.toJSONBytes(bean.getInfo()));
 
-                    log.info("[Triple] service({}#{}:{}) registered success.", group, serviceName, version);
+                    log.info("[Triple] service({}#{}:{}) registered success in path({}).", group, serviceName, version, path);
                 } catch (Exception e) {
                     throw new TripleRpcException(e);
                 }

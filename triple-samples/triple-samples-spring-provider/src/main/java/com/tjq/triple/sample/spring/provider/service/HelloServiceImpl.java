@@ -3,6 +3,7 @@ package com.tjq.triple.sample.spring.provider.service;
 import com.tjq.triple.bootstrap.annotation.TripleProvider;
 import com.tjq.triple.sample.api.HelloService;
 import com.tjq.triple.sample.api.ResultDTO;
+import org.springframework.stereotype.Service;
 
 /**
  * provider
@@ -10,6 +11,7 @@ import com.tjq.triple.sample.api.ResultDTO;
  * @author tjq
  * @since 2020/1/2
  */
+@Service
 @TripleProvider(interfaceClass = HelloService.class)
 public class HelloServiceImpl implements HelloService {
 

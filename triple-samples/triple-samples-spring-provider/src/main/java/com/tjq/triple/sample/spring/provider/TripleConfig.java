@@ -1,5 +1,6 @@
 package com.tjq.triple.sample.spring.provider;
 
+import com.google.common.collect.Lists;
 import com.tjq.triple.bootstrap.TripleServerBootstrap;
 import com.tjq.triple.bootstrap.config.TripleGlobalConfig;
 import com.tjq.triple.bootstrap.config.TripleRegistryConfig;
@@ -26,7 +27,8 @@ public class TripleConfig {
 
         // 2. 注册中心配置
         TripleRegistryConfig registryConfig = new TripleRegistryConfig();
-        registryConfig.setRegisterType(TripleRegisterType.DIRECT);
+        registryConfig.setRegisterType(TripleRegisterType.ZOOKEEPER);
+        registryConfig.setAddressList(Lists.newArrayList("115.159.215.229:2181"));
 
         // 3. 创建服务器
         TripleServerBootstrap server = new TripleServerBootstrap();

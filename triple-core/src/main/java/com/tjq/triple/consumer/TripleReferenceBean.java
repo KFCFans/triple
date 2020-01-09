@@ -12,7 +12,8 @@ import com.tjq.triple.protocol.rpc.TripleRpcRequest;
 import com.tjq.triple.protocol.rpc.TripleRpcResponse;
 import com.tjq.triple.transport.Transporter;
 import com.tjq.triple.transport.TransporterPool;
-import com.tjq.triple.transport.netty4.NettyClientBootstrap;
+import com.tjq.triple.transport.netty4.client.NettyClient;
+import com.tjq.triple.transport.netty4.client.NettyConnectionFactory;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.StringUtils;
@@ -102,8 +103,7 @@ public class TripleReferenceBean<T> {
             int port = Integer.parseInt(split[1]);
             switch (TripleGlobalConfig.getProtocol()) {
                 case TRIPLE_NETTY:
-                    NettyClientBootstrap nettyClient = new NettyClientBootstrap(ip, port);
-                    nettyClient.start();
+                    NettyConnectionFactory.rebuild();
                     break;
                 case TRIPLE_HTTP:
             }

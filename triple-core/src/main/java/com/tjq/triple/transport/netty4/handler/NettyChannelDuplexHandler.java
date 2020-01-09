@@ -1,10 +1,13 @@
 package com.tjq.triple.transport.netty4.handler;
 
+import com.tjq.triple.common.utils.AddressUtils;
 import com.tjq.triple.transport.Transporter;
 import com.tjq.triple.transport.TransporterPool;
 import com.tjq.triple.transport.netty4.NettyTransporter;
+import com.tjq.triple.transport.netty4.client.NettyConnectionFactory;
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -14,7 +17,10 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2020/1/5
  */
 @Slf4j
+@AllArgsConstructor
 public class NettyChannelDuplexHandler extends ChannelDuplexHandler {
+
+    private final boolean isClient;
 
     /**
      * channel 活跃的回调
@@ -31,8 +37,17 @@ public class NettyChannelDuplexHandler extends ChannelDuplexHandler {
      */
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Transporter transporter = new NettyTransporter(ctx.channel());
-        TransporterPool.removeTransporter(transporter);
+
+        String address = AddressUtils.getAddress(ctx.channel());
+
+        // 删除传输器
+        TransporterPool.removeTransporter(address);
+        // 重新建立 provider 连接
+        if (isClient) {
+            log.info("[Triple] channel of remote({}) is inactive, try to reconnect to available provider", address);
+            NettyConnectionFactory.loseProviders(address);
+        }
+
         super.channelInactive(ctx);
     }
 

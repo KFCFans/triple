@@ -16,6 +16,7 @@ public class ConsumerBeanInfo {
     private String group;
     private String version;
     private String serviceName;
+    private Long timeoutMS;
 
     private boolean async;
 }

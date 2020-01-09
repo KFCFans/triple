@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 传输器池
+ * 传输层公共连接池，维护 host(ip:port) -> data channel 的一对一映射关系
  *
  * @author tjq
  * @since 2020/1/4
@@ -26,7 +26,7 @@ public class TransporterPool {
     private static final Map<String, Transporter> address2Transporter = Maps.newConcurrentMap();
 
     /**
-     * 添加传输器
+     * 添加传输器，由 Netty channelActive 回调方法自动添加
      */
     public static void addTransporter(Transporter transporter) {
         String remoteAddress = transporter.remoteAddress();
@@ -34,11 +34,7 @@ public class TransporterPool {
         log.info("[Triple] remote client(address={}) connected", remoteAddress);
     }
 
-    /**
-     * 删除传输器
-     */
-    public static void removeTransporter(Transporter transporter) {
-        String remoteAddress = transporter.remoteAddress();
+    public static void removeTransporter(String remoteAddress) {
         Transporter tsp = address2Transporter.get(remoteAddress);
         if (tsp == null) {
             return;

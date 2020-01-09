@@ -22,7 +22,6 @@ public class RegistryTests {
                 .group("triple")
                 .version("1.0.0.pre")
                 .serviceName("com.tjq.HelloService")
-                .info(Maps.newHashMap())
                 .build();
         zkRegister.register(Lists.newArrayList(beanInfo));
     }

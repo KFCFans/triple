@@ -1,13 +1,10 @@
 package com.tjq.triple.transport.netty4.handler;
 
-import com.tjq.triple.transport.Transporter;
-import com.tjq.triple.transport.TransporterPool;
-import com.tjq.triple.transport.netty4.NettyTransporter;
 import com.tjq.triple.transport.netty4.codec.NettyDecoder;
 import com.tjq.triple.transport.netty4.codec.NettyEncoder;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -18,15 +15,18 @@ import lombok.extern.slf4j.Slf4j;
  * @since 2020/1/5
  */
 @Slf4j
+@AllArgsConstructor
 public class NettyChannelInitializer extends ChannelInitializer<SocketChannel> {
+
+    private final boolean isClient;
 
     @Override
     protected void initChannel(SocketChannel ch) throws Exception {
         ch.pipeline()
-                .addLast(new NettyChannelDuplexHandler())
+                .addLast(new NettyChannelDuplexHandler(isClient))
                 .addLast(new NettyDecoder())
                 .addLast(new NettyEncoder())
                 .addLast(new NettyRpcRequestHandler())
-                .addLast(new NettyRpcResponseHandler());
+                .addLast(new NettyRpcResponseHandler(isClient));
     }
 }

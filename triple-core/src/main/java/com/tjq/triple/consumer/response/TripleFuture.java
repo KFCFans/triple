@@ -5,6 +5,7 @@ import com.tjq.triple.common.exception.TripleRpcException;
 import com.tjq.triple.protocol.rpc.TripleRpcRequest;
 import com.tjq.triple.protocol.rpc.TripleRpcResponse;
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -20,6 +21,9 @@ public class TripleFuture implements Future<TripleRpcResponse> {
 
     @Getter
     private final long createdTime;
+    @Setter
+    @Getter
+    private long timeoutMS;
 
     // 判断是否完成
     private final CountDownLatch latch;
