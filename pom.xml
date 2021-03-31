@@ -26,7 +26,7 @@
         <maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
         <maven-source-plugin.version>3.2.0</maven-source-plugin.version>
 
-        <guava.version>28.1-jre</guava.version>
+        <guava.version>29.0-jre</guava.version>
         <commons.lang3.version>3.8.1</commons.lang3.version>
         <lombok.version>1.18.10</lombok.version>
     </properties>
