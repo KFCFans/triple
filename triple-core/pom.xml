@@ -29,7 +29,7 @@
         <spring.framework.version>5.2.2.RELEASE</spring.framework.version>
         <kryo.version>4.0.2</kryo.version>
         <curator.zk.version>4.2.0</curator.zk.version>
-        <fastjson.version>1.2.62</fastjson.version>
+        <fastjson.version>1.2.83</fastjson.version>
         <junit.version>5.5.2</junit.version>
 
         <!-- optional dependencies -->
